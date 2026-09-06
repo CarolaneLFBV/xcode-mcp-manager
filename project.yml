@@ -1,0 +1,72 @@
+name: MCPManager
+options:
+  developmentLanguage: fr
+  bundleIdPrefix: com.example
+  deploymentTarget:
+    macOS: "14.0"
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+configFiles:
+  Debug: Config/Version.xcconfig
+  Release: Config/Version.xcconfig
+targets:
+  MCPManager:
+    type: application
+    platform: macOS
+    sources:
+      - path: MCPManager
+      - path: Design/MCPManagerIcon.icon
+        type: file
+        buildPhase: resources
+      - path: Shared
+    dependencies:
+      - target: MCPEnvironmentLauncher
+        embed: false
+    postBuildScripts:
+      - name: Embed environment launcher
+        script: |
+          mkdir -p "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers"
+          ditto "${BUILT_PRODUCTS_DIR}/mcp-manager-launcher" "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/mcp-manager-launcher.new"
+          mv -f "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/mcp-manager-launcher.new" "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/mcp-manager-launcher"
+        inputFiles:
+          - "$(BUILT_PRODUCTS_DIR)/mcp-manager-launcher"
+        outputFiles:
+          - "$(TARGET_BUILD_DIR)/$(CONTENTS_FOLDER_PATH)/Helpers/mcp-manager-launcher"
+    settings:
+      base:
+        PRODUCT_NAME: MCPManager
+        SWIFT_EMIT_LOC_STRINGS: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.mcpmanager
+        PRODUCT_MODULE_NAME: MCPManager
+        ASSETCATALOG_COMPILER_APPICON_NAME: MCPManagerIcon
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: MCP Manager
+        INFOPLIST_KEY_MCPReleaseVersion: $(RELEASE_VERSION)
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.developer-tools
+        CODE_SIGN_STYLE: Automatic
+    scheme:
+      testTargets:
+        - MCPManagerTests
+  MCPEnvironmentLauncher:
+    type: tool
+    platform: macOS
+    sources:
+      - path: MCPEnvironmentLauncher
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_NAME: mcp-manager-launcher
+        PRODUCT_MODULE_NAME: MCPEnvironmentLauncher
+        CODE_SIGN_STYLE: Automatic
+  MCPManagerTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: MCPManagerTests
+    dependencies:
+      - target: MCPManager
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES

@@ -1,0 +1,32 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  synthetic-checks:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+      - name: Release metadata
+        run: |
+          ruby scripts/check-release.rb
+          ruby scripts/test-release.rb
+      - name: Catalog
+        run: bash scripts/check-catalog.sh
+      - name: Presentation and compiled localizations
+        run: bash scripts/check-presentation.sh
+      - name: Supervisor lifecycle
+        run: bash scripts/check-supervisor.sh
+      - name: Localization coverage
+        run: ruby scripts/check-localization.rb

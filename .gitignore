@@ -1,0 +1,27 @@
+# Local macOS / Xcode state
+.local-notes/
+.DS_Store
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+*.xcarchive
+*.dSYM/
+*.app/
+*.ipa
+*.dmg
+*.zip
+*.xcresult/
+dist/
+release-notes.md
+
+# Local credentials (never commit real profiles or tokens)
+.env
+.env.*
+!.env.example
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Keep source assets, project.yml and the generated .xcodeproj tracked.
